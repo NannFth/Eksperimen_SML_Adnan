@@ -1,0 +1,37 @@
+name: Preprocessing Automation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  preprocessing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.7'
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas numpy scikit-learn
+
+      - name: Run Preprocessing Script
+        run: |
+          cd preprocessing
+          python automate_Adnan.py
+
+      - name: Commit and Push Processed Dataset
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add preprocessing/california_housing_preprocessing/*
+          git diff --staged --quiet || git commit -m "Automated preprocessing update [skip ci]"
+          git push
